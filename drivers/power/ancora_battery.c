@@ -1264,7 +1264,7 @@ static int msm_batt_check_level(int battery_level)
 	*/
 	if ( (msm_batt_info.batt_full_check == 0) && (battery_level == 100) )
 	{
-		battery_level = 99;	// not yet fully charged
+		battery_level = 100;	// fully charged
 	}
 /*
 	else if ( (battery_level == 0)
