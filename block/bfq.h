@@ -189,7 +189,9 @@ struct bfq_group;
  * @pid: pid of the process owning the queue, used for logging purposes.
  * @last_rais_start_time: last (idle -> weight-raised) transition attempt
  * @raising_cur_max_time: current max raising time for this queue
- *
+ * @cic: pointer to the cfq_io_context owning the bfq queue, set to %NULL if the
+ *   queue is shared
+ * 
  * A bfq_queue is a leaf request queue; it can be associated to an io_context
  * or more (if it is an async one).  @cgroup holds a reference to the
  * cgroup, to be sure that it does not disappear while a bfqq still
@@ -238,7 +240,9 @@ struct bfq_queue {
 	unsigned int raising_cur_max_time;
 	u64 last_rais_start_finish, soft_rt_next_start;
 	unsigned int raising_coeff;
-};
+
+	struct cfq_io_context *cic;
+};	
 
 /**
  * struct bfq_data - per device data structure.
@@ -382,8 +386,9 @@ enum bfqq_state_flags {
 	BFQ_BFQQ_FLAG_coop,		/* bfqq is shared */
 	BFQ_BFQQ_FLAG_split_coop,	/* shared bfqq will be splitted */
 	BFQ_BFQQ_FLAG_some_coop_idle,   /* some cooperator is inactive */
+	BFQ_BFQQ_FLAG_just_split,  	/* queue has just been split */
 };
-
+	
 #define BFQ_BFQQ_FNS(name)						\
 static inline void bfq_mark_bfqq_##name(struct bfq_queue *bfqq)		\
 {									\
@@ -409,6 +414,7 @@ BFQ_BFQQ_FNS(budget_new);
 BFQ_BFQQ_FNS(coop);
 BFQ_BFQQ_FNS(split_coop);
 BFQ_BFQQ_FNS(some_coop_idle);
+BFQ_BFQQ_FNS(just_split);
 #undef BFQ_BFQQ_FNS
 
 /* Logging facilities. */
